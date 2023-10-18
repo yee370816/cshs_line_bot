@@ -58,9 +58,13 @@ def handle_text_message(event):
         #     )
         # else:
         #     profile = line_bot_api.get_profile(event.source.user_id)
-        student_module = student_modules[event.source.user_id]
-        student_function = getattr(student_module, "process")
-        reply_message = student_function(event.message.text)
+        try:
+            student_module = student_modules[event.source.user_id]
+            student_function = getattr(student_module, "process")
+            reply_message = student_function(event.message.text)
+        except Exception as ex:
+            reply_message = event.source.user_id
+            
         line_bot_api.reply_message_with_http_info(
             ReplyMessageRequest(
                 reply_token=event.reply_token,
