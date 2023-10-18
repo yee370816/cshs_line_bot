@@ -51,10 +51,20 @@ def callback():
 def handle_text_message(event):
     with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
+        # if hasattr(event.source, "group_id"):
+        #     profile = line_bot_api.get_group_member_profile(
+        #         event.source.group_id,
+        #         event.source.user_id
+        #     )
+        # else:
+        #     profile = line_bot_api.get_profile(event.source.user_id)
+        student_module = student_modules[event.source.user_id]
+        student_function = getattr(student_module, "process")
+        reply_message = student_function(event.message.text)
         line_bot_api.reply_message_with_http_info(
             ReplyMessageRequest(
                 reply_token=event.reply_token,
-                messages=[TextMessage(text="Hello World")]
+                messages=[TextMessage(text=reply_message)]
             )
         )
 
