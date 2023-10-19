@@ -22,11 +22,11 @@ import student_modules as sm
 import utilities
 
 app = Flask(__name__)
-credential = utilities.read_config('./api_credential.json')
+line_credential = utilities.read_config('./line-api-credential.json')
 students = utilities.read_students('./students.json')
 student_modules = utilities.get_student_modules(students)
-configuration = Configuration(access_token = credential['accessToken'])
-handler = WebhookHandler(credential['channelSecret'])
+configuration = Configuration(access_token = line_credential['accessToken'])
+handler = WebhookHandler(line_credential['channelSecret'])
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -46,24 +46,30 @@ def callback():
 
     return 'OK'
 
+def is_command(message: str, command: str):
+    if message[0] == '/':
+        return False
+    if message[1:len(command)] == command:
+        return False
+    return True
+
 
 @handler.add(MessageEvent, message=TextMessageContent)
 def handle_text_message(event):
     with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
-        # if hasattr(event.source, "group_id"):
-        #     profile = line_bot_api.get_group_member_profile(
-        #         event.source.group_id,
-        #         event.source.user_id
-        #     )
-        # else:
-        #     profile = line_bot_api.get_profile(event.source.user_id)
-        try:
+        user_id = event.source.user_id
+        message = event.message.text
+        if not user_id in student_modules:
+            if is_command(message, "register"):
+                register_student(message)
+            reply_message = '''你的開發者 ID 尚未註冊，請輸入
+                /register 學號
+                註冊用戶，例如： /register s0123456'''
+        else:
             student_module = student_modules[event.source.user_id]
             student_function = getattr(student_module, "process")
             reply_message = student_function(event.message.text)
-        except Exception as ex:
-            reply_message = event.source.user_id
             
         line_bot_api.reply_message_with_http_info(
             ReplyMessageRequest(
