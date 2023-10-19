@@ -1,4 +1,4 @@
-def process(message) -> None:
+def process(message: str) -> None:
     if message == "資訊社":
         return "讚"
     if message == "資訊老師":
