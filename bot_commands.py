@@ -1,5 +1,12 @@
 from student_manager import StudentManager
 
+SYSTEM_COMMANDS = {
+    "/register",
+    "/help",
+    "/id",
+    "/token",
+}
+
 class BotCommand:
     def __init__(self, user_id: str, message: str) -> None:
         if not user_id:
@@ -13,6 +20,7 @@ class BotCommand:
         self.user_id: str = user_id
         self.command: str = message_values[0]
         self.arguments: list = message_values[1:]
+        self.is_system_command = self.command in SYSTEM_COMMANDS
 
 stu_manager = StudentManager()
 
@@ -31,12 +39,18 @@ def process_show_id(command_obj: dict) -> str:
 def process_show_token(command_obj: dict) -> str:
     pass
 
-SYSTEM_COMMANDS = {
+command_processors = {
     "/register": process_register,
     "/help": process_help,
     "/id": process_show_id,
     "/token": process_show_token,
 }
+
+def is_system_message(message: str) -> bool:
+    if message[0] != '/':
+        return False
+    message_values = message.split(' ')
+    
 
 def is_system_command(command_obj: dict) -> bool:
     if command_obj["command"] in SYSTEM_COMMANDS:
@@ -59,6 +73,6 @@ def process_system_command(command_obj: dict) -> str:
         return "錯誤: 此訊息非系統指令"
     arguments = message.split(' ')
     command = arguments[0]
-    action = SYSTEM_COMMANDS[command]
+    action = command_processors[command]
     result = action(arguments)
     return result

@@ -19,6 +19,7 @@ from linebot.v3.webhooks import (
 )
 
 from student_manager import StudentManager
+import bot_commands
 import utilities
 
 app = Flask(__name__)
@@ -57,10 +58,13 @@ def handle_text_message(event):
         line_bot_api = MessagingApi(api_client)
         user_id = event.source.user_id
         message = event.message.text
+        command_obj = bot_commands.BotCommand(user_id, message)
         if is_group_event(event) and not stu_manager.is_student_registered(user_id):
             reply_message = '''你的開發者 ID 尚未註冊，請輸入
             /register 班級 座號 姓名 學號
             註冊用戶，例如： /register 高零0 1 s0123456'''
+        elif command_obj.is_system_command:
+            reply_message = bot_commands.process_system_command(command_obj)
         else:
             student_module = student_modules[user_id]
             student_function = getattr(student_module, "process")
