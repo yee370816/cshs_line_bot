@@ -1,3 +1,4 @@
+*.pyc
 students.json
 line-api-credential.json
 sheet-api-credential.json
