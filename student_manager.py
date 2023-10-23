@@ -46,7 +46,7 @@ class StudentManager:
         student_no = arguments[4]
         if not self.is_valide_student_no(student_no):
             return "學號格式有誤"
-        if self.is_student_exists(command_obj.user_id):
+        if self.is_student_registered(command_obj.user_id):
             return "你已經註冊過"
         row = [
             class_unit,
@@ -57,13 +57,13 @@ class StudentManager:
         ]
         self.worksheet.append_row(row)
 
-    def is_student_exists(self, user_id: str) -> bool:
+    def is_student_registered(self, user_id: str) -> bool:
         return user_id in self.students
 
     def is_valide_student_no(self, student_no: str) -> bool:
         return re.match(self.stu_no_pattern, student_no)
 
     def get_student(self, user_id: str) -> dict:
-        if not self.is_student_exists(user_id):
+        if not self.is_student_registered(user_id):
             return None
         return self.students[user_id]
