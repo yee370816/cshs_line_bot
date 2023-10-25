@@ -1,6 +1,6 @@
 import re
 import gspread
-from bot_commands import BotCommand
+from bot_command.command_base import BotCommand
 
 class StudentManager:
     def __init__(self, credential_path: str = 'sheet-api-credential.json') -> None:

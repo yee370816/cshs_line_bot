@@ -19,7 +19,8 @@ from linebot.v3.webhooks import (
 )
 
 from student_manager import StudentManager
-import bot_commands
+from bot_command.command_base import BotCommand
+from bot_command.command_processors import BotCommandProcessor
 import utilities
 
 app = Flask(__name__)
@@ -29,6 +30,7 @@ student_modules = utilities.get_student_modules(students)
 stu_manager = StudentManager()
 configuration = Configuration(access_token = line_credential['accessToken'])
 handler = WebhookHandler(line_credential['channelSecret'])
+command_processor = BotCommandProcessor(stu_manager)
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -58,18 +60,19 @@ def handle_text_message(event):
         line_bot_api = MessagingApi(api_client)
         user_id = event.source.user_id
         message = event.message.text
-        command_obj = bot_commands.BotCommand(user_id, message)
-        if is_group_event(event) and not stu_manager.is_student_registered(user_id):
+        command_obj = BotCommand(user_id, message)
+        registered = command_processor.stu_manager.is_student_registered(user_id)
+        if is_group_event(event) and not registered:
             reply_message = '''你的開發者 ID 尚未註冊，請輸入
             /register 班級 座號 姓名 學號
             註冊用戶，例如： /register 高零0 1 s0123456'''
         elif command_obj.is_system_command:
-            reply_message = bot_commands.process_system_command(command_obj)
+            reply_message = command_processor.process_system_command(command_obj)
         else:
             student_module = student_modules[user_id]
             student_function = getattr(student_module, "process")
             reply_message = student_function(message)
-            
+
         line_bot_api.reply_message_with_http_info(
             ReplyMessageRequest(
                 reply_token=event.reply_token,
