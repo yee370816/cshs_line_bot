@@ -51,8 +51,12 @@ def callback():
     return 'OK'
 
 def is_group_event(event: dict) -> bool:
-    return hasattr(event, "group_id")
+    return hasattr(event.source, "group_id")
 
+def get_command_obj(user_id: str, message: str) -> BotCommand:
+    if message[0] != '/':
+        return None
+    return BotCommand(user_id, message)
 
 @handler.add(MessageEvent, message=TextMessageContent)
 def handle_text_message(event):
@@ -60,14 +64,15 @@ def handle_text_message(event):
         line_bot_api = MessagingApi(api_client)
         user_id = event.source.user_id
         message = event.message.text
-        command_obj = BotCommand(user_id, message)
         registered = command_processor.stu_manager.is_student_registered(user_id)
-        if is_group_event(event) and not registered:
-            reply_message = '''你的開發者 ID 尚未註冊，請輸入
-            /register 班級 座號 姓名 學號
-            註冊用戶，例如： /register 高零0 1 s0123456'''
-        elif command_obj.is_system_command:
+        command_obj = get_command_obj(user_id, message)
+
+        if command_obj and command_obj.is_system_command:
             reply_message = command_processor.process_system_command(command_obj)
+        elif is_group_event(event) and not registered:
+            reply_message = '''你的開發者 ID 尚未註冊，請輸入
+/register 班級 座號 姓名 學號
+註冊用戶，例如： /register 高一0 99 竹山金城武 s0123456'''
         else:
             student_module = student_modules[user_id]
             student_function = getattr(student_module, "process")

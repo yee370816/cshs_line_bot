@@ -20,7 +20,8 @@ class BotCommandProcessor:
         }
     def process_register(self, command_obj: BotCommand) -> str:
         try:
-            self.stu_manager.register_student(command_obj)
+            result = self.stu_manager.register_student(command_obj)
+            return result
         except Exception as ex:
             return str(ex)
 
@@ -35,12 +36,12 @@ class BotCommandProcessor:
     def process_show_id(self, command_obj: BotCommand) -> str:
         return f"你的開發者ID是\n{command_obj.user_id}"
 
-    def process_show_token(self, command_obj: dict) -> str:
+    def process_show_token(self, command_obj: BotCommand) -> str:
         pass
         
 
-    def is_system_command(self, command_obj: dict) -> bool:
-        if command_obj["command"] in SYSTEM_COMMANDS:
+    def is_system_command(self, command_obj: BotCommand) -> bool:
+        if command_obj.command in SYSTEM_COMMANDS:
             return True
         return False
 
@@ -55,8 +56,7 @@ class BotCommandProcessor:
 
 
     def process_system_command(self, command_obj: BotCommand) -> str:
-        message:str = command_obj.command
-        if not self.is_system_command(message):
+        if not self.is_system_command(command_obj):
             return "錯誤: 此訊息非系統指令"
         action = self.command_processors[command_obj.command]
         result = action(command_obj)
