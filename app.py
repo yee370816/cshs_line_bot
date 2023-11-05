@@ -55,7 +55,7 @@ def inservice_handler():
     elif cmd == "system-reload":
         cipher.reload_words()
     else:
-        return 400
+        abort(400)
 
 @app.route("/callback", methods=['POST'])
 def callback():
