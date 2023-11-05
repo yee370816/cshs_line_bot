@@ -11,6 +11,8 @@ class CaesarCipher:
         self.prefix_len = 0
         self.surfix_len = 0
         self.reload_words()
+        self.next_plaintext()
+        self.encrypt()
 
     def reload_words(self) -> None:
         work_book = self.service_account.open("資訊科技 Sheet 應用") # title: sheet title, NOT tab name
