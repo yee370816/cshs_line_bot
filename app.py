@@ -23,6 +23,7 @@ from bot_command.command_base import BotCommand
 from bot_command.command_processors import BotCommandProcessor
 from caesar_cipher.caesar_cipher import CaesarCipher
 import utilities
+from datetime import datetime
 
 app = Flask(__name__)
 line_credential = utilities.read_config('./line-api-credential.json')
@@ -32,23 +33,29 @@ stu_manager = StudentManager()
 configuration = Configuration(access_token = line_credential['accessToken'])
 handler = WebhookHandler(line_credential['channelSecret'])
 command_processor = BotCommandProcessor(stu_manager)
-cipher: CaesarCipher = CaesarCipher()
+cipher = CaesarCipher()
 
 @app.route("/inservice/caesar-cipher", methods=['GET'])
 def inservice_handler():
-    if cipher is None:
-        cipher = CaesarCipher()
-
     cmd = request.args.get('cmd').lower()
-    mode = request.args.get('mode').lower()
     if cmd == "answer":
-        return cipher.get_plaintext()
+        ans = request.args.get("ans").lower()
+        if ans == cipher.get_plaintext():
+            time_string = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            return f"Correct!,{time_string}"
+        else:
+            return "try again"
     elif cmd == "query":
         return cipher.get_ciphertext()
     elif cmd == "system-next":
+        mode = request.args.get('mode').lower()
         cipher.next_plaintext(mode == "advanced")
+        cipher.encrypt()
+        return "ok"
     elif cmd == "system-reload":
-        cipher = CaesarCipher()
+        cipher.reload_words()
+    else:
+        return 400
 
 @app.route("/callback", methods=['POST'])
 def callback():
