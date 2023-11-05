@@ -21,6 +21,7 @@ from linebot.v3.webhooks import (
 from student_manager import StudentManager
 from bot_command.command_base import BotCommand
 from bot_command.command_processors import BotCommandProcessor
+from caesar_cipher.caesar_cipher import CaesarCipher
 import utilities
 
 app = Flask(__name__)
@@ -31,6 +32,23 @@ stu_manager = StudentManager()
 configuration = Configuration(access_token = line_credential['accessToken'])
 handler = WebhookHandler(line_credential['channelSecret'])
 command_processor = BotCommandProcessor(stu_manager)
+cipher: CaesarCipher = CaesarCipher()
+
+@app.route("/inservice/caesar-cipher", methods=['GET'])
+def inservice_handler():
+    if cipher is None:
+        cipher = CaesarCipher()
+
+    cmd = request.args.get('cmd').lower()
+    mode = request.args.get('mode').lower()
+    if cmd == "answer":
+        return cipher.get_plaintext()
+    elif cmd == "query":
+        return cipher.get_ciphertext()
+    elif cmd == "system-next":
+        cipher.next_plaintext(mode == "advanced")
+    elif cmd == "system-reload":
+        cipher = CaesarCipher()
 
 @app.route("/callback", methods=['POST'])
 def callback():
