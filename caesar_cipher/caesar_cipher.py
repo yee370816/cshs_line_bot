@@ -13,8 +13,9 @@ class CaesarCipher:
         self.prefix_len = 0
         self.surfix_len = 0
         self.fake_option_count = 2
+        self.advanced_mode = False
         self.reload_words()
-        self.next_question()
+        self.next_question(self.advanced_mode)
 
     def reload_words(self) -> None:
         work_book = self.service_account.open("資訊科技 Sheet 應用") # title: sheet title, NOT tab name
@@ -24,7 +25,7 @@ class CaesarCipher:
         self.prefix_len = len(self.prefixes)
         self.surfix_len = len(self.prefixes)
 
-    def next_question(self, advanced_mode = False) -> None:
+    def next_question(self, advanced_mode) -> None:
         i = random.randint(0, self.prefix_len -1)
         j = random.randint(0, self.surfix_len -1)
         self.plain_prefix = self.prefixes[i]
@@ -34,6 +35,7 @@ class CaesarCipher:
         else:
             self.full_plaintext = self.plain_surfix
         self.encrypt()
+        self.advanced_mode = advanced_mode
 
     def encrypt(self) -> str:
         shift = random.randint(1, 5)
@@ -62,21 +64,21 @@ class CaesarCipher:
     def get_plaintext(self) -> str:
         return self.full_plaintext
 
-    def get_question(self, advanced_mode = False) -> str:
+    def get_question(self) -> str:
         question = [self.ciphertext] # [0]: ciphertext
-        options = self.get_options(advanced_mode) # [1~n]: 1 answer and n-1 fake
+        options = self.get_options() # [1~n]: 1 answer and n-1 fake
         random.shuffle(options)
         question.extend(options)
         return ",".join(question) # "ciphertext,opt1,opt2,optn"
     
     # improve performace if have time
-    def get_options(self, advanced_mode = False) -> list:
+    def get_options(self) -> list:
         optinos = [self.full_plaintext]
         surfix_len = len(self.plain_surfix)
         prefix_len = len(self.plain_surfix)
         valid_surfixes = [x for x in self.surfixes if len(x) == surfix_len and x != self.plain_surfix]
         random.shuffle(valid_surfixes)
-        if not advanced_mode:
+        if not self.advanced_mode:
             optinos.extend(valid_surfixes[0:2])
             return optinos
 
