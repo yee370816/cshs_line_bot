@@ -39,7 +39,7 @@ cipher = CaesarCipher()
 def inservice_handler():
     cmd = request.args.get('cmd').lower()
     if cmd == "answer":
-        ans = request.args.get("ans").lower()
+        ans = request.args.get("ans")
         if ans == cipher.get_plaintext():
             time_string = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             return f"Correct!,{time_string}"
@@ -49,7 +49,7 @@ def inservice_handler():
         return cipher.get_question()
     elif cmd == "system-next":
         mode = request.args.get('mode').lower()
-        cipher.next_plaintext(mode == "advanced")
+        cipher.next_question(mode == "advanced")
         cipher.encrypt()
         return "ok"
     elif cmd == "system-reload":

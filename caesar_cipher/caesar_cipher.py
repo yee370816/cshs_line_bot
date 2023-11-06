@@ -14,8 +14,7 @@ class CaesarCipher:
         self.surfix_len = 0
         self.fake_option_count = 2
         self.reload_words()
-        self.next_plaintext(True)
-        self.encrypt()
+        self.next_question()
 
     def reload_words(self) -> None:
         work_book = self.service_account.open("資訊科技 Sheet 應用") # title: sheet title, NOT tab name
@@ -25,7 +24,7 @@ class CaesarCipher:
         self.prefix_len = len(self.prefixes)
         self.surfix_len = len(self.prefixes)
 
-    def next_plaintext(self, advanced_mode = False) -> None:
+    def next_question(self, advanced_mode = False) -> None:
         i = random.randint(0, self.prefix_len -1)
         j = random.randint(0, self.surfix_len -1)
         self.plain_prefix = self.prefixes[i]
@@ -34,6 +33,7 @@ class CaesarCipher:
             self.full_plaintext = f"{self.plain_prefix} {self.plain_surfix}"
         else:
             self.full_plaintext = self.plain_surfix
+        self.encrypt()
 
     def encrypt(self) -> str:
         shift = random.randint(1, 5)
@@ -65,6 +65,7 @@ class CaesarCipher:
     def get_question(self, advanced_mode = False) -> str:
         question = [self.ciphertext] # [0]: ciphertext
         options = self.get_options(advanced_mode) # [1~n]: 1 answer and n-1 fake
+        random.shuffle(options)
         question.extend(options)
         return ",".join(question) # "ciphertext,opt1,opt2,optn"
     
