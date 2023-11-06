@@ -41,7 +41,7 @@ def inservice_handler():
     if cmd == "answer":
         ans = request.args.get("ans")
         if ans == cipher.get_plaintext():
-            time_string = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            time_string = datetime.now().strftime('%Y-%m-%d,%H:%M:%S')
             return f"Correct!,{time_string}"
         else:
             return "try again"
