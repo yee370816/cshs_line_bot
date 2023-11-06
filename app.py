@@ -46,7 +46,7 @@ def inservice_handler():
         else:
             return "try again"
     elif cmd == "query":
-        return cipher.get_ciphertext()
+        return cipher.get_question()
     elif cmd == "system-next":
         mode = request.args.get('mode').lower()
         cipher.next_plaintext(mode == "advanced")
