@@ -9,8 +9,6 @@ def process(message: str) -> None:
         return "棒"
     if message == "資訊社的電腦":
         return "不好說"
-    if message == "原神:
-        return "啟動!!!"
     if message == "原神":
         return "啟動!!!"
     if message == "今年多大了":
