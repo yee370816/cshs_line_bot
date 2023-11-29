@@ -1,5 +1,4 @@
 def process(message: str) -> None:
-    passdef process(message: str) -> None:
     if message == "debug":
         return message
     if message == "資訊社":
