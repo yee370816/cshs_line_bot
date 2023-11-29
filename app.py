@@ -18,18 +18,17 @@ from linebot.v3.webhooks import (
     StickerMessageContent
 )
 
+from datetime import datetime
 from student_manager import StudentManager
 from bot_command.command_base import BotCommand
 from bot_command.command_processors import BotCommandProcessor
 from caesar_cipher.caesar_cipher import CaesarCipher
 import utilities
-from datetime import datetime
 
 app = Flask(__name__)
 line_credential = utilities.read_config('./line-api-credential.json')
-students = utilities.read_students('./students.json')
-student_modules = utilities.get_student_modules(students)
 stu_manager = StudentManager()
+student_modules = utilities.get_student_modules(stu_manager.students)
 configuration = Configuration(access_token = line_credential['accessToken'])
 handler = WebhookHandler(line_credential['channelSecret'])
 command_processor = BotCommandProcessor(stu_manager)
@@ -94,7 +93,7 @@ def handle_text_message(event):
 
         if command_obj and command_obj.is_system_command:
             reply_message = command_processor.process_system_command(command_obj)
-        elif is_group_event(event) and not registered:
+        elif not registered:
             reply_message = '''你的開發者 ID 尚未註冊，請輸入
 /register 班級 座號 姓名 學號
 註冊用戶，例如： /register 高一0 99 竹山金城武 s0123456'''
