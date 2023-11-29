@@ -8,4 +8,6 @@ def process(message: str) -> None:
     if message == "資訊社的同學":
         return "棒"
     if message == "資訊社的電腦":
-        return "不好說"
+        return "爛到掉渣"
+    if message == "喔~":
+        return "喔~"
